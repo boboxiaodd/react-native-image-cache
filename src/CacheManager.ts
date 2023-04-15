@@ -1,8 +1,9 @@
 // @ts-ignore
 import SHA1 from 'crypto-js/sha1';
+// @ts-ignore
 import uniqueId from 'lodash/uniqueId';
 // import { FileStat, FileSystem } from 'react-native-file-access';
-import ReactNativeBlobUtil from 'react-native-blob-util';
+import ReactNativeBlobUtil, {ReactNativeBlobUtilStat} from 'react-native-blob-util';
 
 import { Config, DownloadOptions } from './types';
 import defaultConfiguration from './defaultConfiguration';
@@ -63,16 +64,21 @@ export class CacheEntry {
     }
 
     if (source != null) {
-      const result = await FileSystem.fetch(source, {
+      let headers = {};
+      if(options && options.headers){
+        headers = options.headers;
+      }
+      const result = await ReactNativeBlobUtil.config({
         path: tmpPath,
-        ...options,
-      });
+      }).fetch('GET',source, headers, {});
+
+
       // If the image download failed, we don't cache anything
-      if (result && result.status !== 200) {
+      if (result && result.info().status !== 200) {
         this.downloadPromise = undefined;
         return undefined;
       }
-      await FileSystem.mv(tmpPath, path);
+      await ReactNativeBlobUtil.fs.mv(tmpPath, path);
       if (CacheManager.config.cacheLimit) {
         await CacheManager.pruneCache();
       }
@@ -117,10 +123,10 @@ export default class CacheManager {
   }
 
   static async clearCache(): Promise<void> {
-    const files = await FileSystem.ls(CacheManager.config.baseDir);
+    const files = await ReactNativeBlobUtil.fs.ls(CacheManager.config.baseDir);
     for (const file of files) {
       try {
-        await FileSystem.unlink(`${CacheManager.config.baseDir}${file}`);
+        await ReactNativeBlobUtil.fs.unlink(`${CacheManager.config.baseDir}${file}`);
       } catch (e) {
         console.log(`error while clearing images cache, error: ${e}`);
       }
@@ -131,14 +137,14 @@ export default class CacheManager {
     try {
       const file = await getCacheEntry(entry);
       const { path } = file;
-      await FileSystem.unlink(path);
+      await ReactNativeBlobUtil.fs.unlink(path);
     } catch (e) {
       throw new Error('error while clearing image from cache');
     }
   }
 
   static async getCacheSize(): Promise<number> {
-    const result = await FileSystem.stat(CacheManager.config.baseDir);
+    const result = await ReactNativeBlobUtil.fs.stat(CacheManager.config.baseDir);
     if (!result) {
       throw new Error(`${CacheManager.config.baseDir} not found`);
     }
@@ -171,7 +177,7 @@ export default class CacheManager {
   ): Promise<string | undefined> {
     const path = await CacheManager.get(source, options).getPath();
     if (path) {
-      const blob = await FileSystem.readFile(path, 'base64');
+      const blob = await ReactNativeBlobUtil.fs.readFile(path, 'base64');
       return blob;
     }
     return undefined;
@@ -183,13 +189,13 @@ export default class CacheManager {
       return;
     }
 
-    const files = await FileSystem.statDir(CacheManager.config.baseDir);
+    const files = await ReactNativeBlobUtil.fs.lstat(CacheManager.config.baseDir);
 
-    files.sort((a: FileStat, b: FileStat) => {
+    files.sort((a: ReactNativeBlobUtilStat, b: ReactNativeBlobUtilStat) => {
       return a.lastModified - b.lastModified;
     });
 
-    const currentCacheSize = files.reduce((cacheSize, file: FileStat) => {
+    const currentCacheSize = files.reduce((cacheSize, file: ReactNativeBlobUtilStat) => {
       return cacheSize + file.size;
     }, 0);
 
@@ -199,9 +205,9 @@ export default class CacheManager {
       while (overflowSize > 0 && files.length) {
         const file = files.shift();
         if (file) {
-          if (await FileSystem.exists(file.path)) {
+          if (await ReactNativeBlobUtil.fs.exists(file.path)) {
             overflowSize = overflowSize - file.size;
-            await FileSystem.unlink(file.path).catch(e => console.log(e));
+            await ReactNativeBlobUtil.fs.unlink(file.path).catch(e => console.log(e));
           }
         }
       }
@@ -230,17 +236,17 @@ const getCacheEntry = async (
   const tmpPath = `${CacheManager.config.baseDir}${sha}-${uniqueId()}${ext}`;
   // TODO: maybe we don't have to do this every time
   try {
-    await FileSystem.mkdir(CacheManager.config.baseDir);
+    await ReactNativeBlobUtil.fs.mkdir(CacheManager.config.baseDir);
   } catch (e) {
     // do nothing
   }
-  const exists = await FileSystem.exists(path);
+  const exists = await ReactNativeBlobUtil.fs.exists(path);
 
   if (maxAge && exists) {
-    const { lastModified } = await FileSystem.stat(path);
+    const { lastModified } = await ReactNativeBlobUtil.fs.stat(path);
     const ageInHours = Math.floor(Date.now() - lastModified) / 1000 / 3600;
     if (maxAge < ageInHours) {
-      await FileSystem.unlink(path);
+      await ReactNativeBlobUtil.fs.unlink(path);
       return { exists: false, path, tmpPath };
     }
   }
