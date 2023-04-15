@@ -2,6 +2,8 @@
 
 `react-native-file-access` to [`react-native-blob-util`](https://github.com/RonRadtke/react-native-blob-util)
 
+fixed `ReactImageView: Image source "null" doesn't exist` when not set `loadingSource`
+
 
 # React Native Image Cache on File System with Progressive Loading
 
