@@ -1,3 +1,8 @@
+# This fork Change:
+
+`react-native-file-access` to [`react-native-blob-util`](https://github.com/RonRadtke/react-native-blob-util)
+
+
 # React Native Image Cache on File System with Progressive Loading
 
 [![npm version](https://img.shields.io/npm/v/@georstat/react-native-image-cache.svg?style=for-the-badge)](https://www.npmjs.com/package/@georstat/react-native-image-cache)
