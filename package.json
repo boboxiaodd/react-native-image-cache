@@ -1,5 +1,5 @@
 {
-  "name": "@georstat/react-native-image-cache",
+  "name": "@boboxiaodd/react-native-image-cache",
   "version": "2.3.0",
   "access": "public",
   "description": "React Native image file system caching for iOS and Android",
