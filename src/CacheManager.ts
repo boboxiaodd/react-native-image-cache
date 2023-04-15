@@ -1,7 +1,8 @@
 // @ts-ignore
 import SHA1 from 'crypto-js/sha1';
 import uniqueId from 'lodash/uniqueId';
-import { FileStat, FileSystem } from 'react-native-file-access';
+// import { FileStat, FileSystem } from 'react-native-file-access';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 
 import { Config, DownloadOptions } from './types';
 import defaultConfiguration from './defaultConfiguration';
