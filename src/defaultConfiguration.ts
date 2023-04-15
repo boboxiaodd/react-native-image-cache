@@ -1,7 +1,7 @@
-import { Dirs } from 'react-native-file-access';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 
 export default {
-  baseDir: `${Dirs.CacheDir}/images_cache/`,
+  baseDir: `${ReactNativeBlobUtil.fs.dirs.CacheDir}/images_cache/`,
   blurRadius: 15,
   cacheLimit: 0,
   sourceAnimationDuration: 1000,
