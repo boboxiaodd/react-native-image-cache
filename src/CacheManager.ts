@@ -36,7 +36,6 @@ export class CacheEntry {
   async getPath(): Promise<string | undefined> {
     const { source, maxAge, noCache } = this;
     const { exists, path, tmpPath } = await getCacheEntry(source, maxAge);
-
     if (exists && !noCache) {
       return path;
     }
@@ -68,11 +67,9 @@ export class CacheEntry {
       if(options && options.headers){
         headers = options.headers;
       }
-      const result = await ReactNativeBlobUtil.config({
-        path: tmpPath,
-      }).fetch('GET',source, headers, {});
-
-
+      const result = await ReactNativeBlobUtil.config({path: tmpPath })
+                                        .fetch('GET',source, headers);
+      
       // If the image download failed, we don't cache anything
       if (result && result.info().status !== 200) {
         this.downloadPromise = undefined;
