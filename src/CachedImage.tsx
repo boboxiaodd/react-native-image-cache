@@ -63,23 +63,23 @@ const CachedImage = (props: IProps & typeof defaultProps) => {
     const {source: propsSource} = props;
     const [currentSource, setCurrentSource] = React.useState<string>(propsSource);
 
-    const animatedImage = useSharedValue(0);
+    // const animatedImage = useSharedValue(0);
+    //
+    // const animatedThumbnailImage = useSharedValue(0);
+    //
+    // const animatedLoadingImage = useSharedValue(1);
 
-    const animatedThumbnailImage = useSharedValue(0);
-
-    const animatedLoadingImage = useSharedValue(1);
-
-    const imageSourceStyle = useAnimatedStyle(() => {
-        return {opacity: animatedImage.value};
-    });
-
-    const thumbnailSourceStyle = useAnimatedStyle(() => {
-        return {opacity: animatedThumbnailImage.value};
-    });
-
-    const animatedLoadingImageStyle = useAnimatedStyle(() => {
-        return {opacity: animatedLoadingImage.value};
-    });
+    // const imageSourceStyle = useAnimatedStyle(() => {
+    //     return {opacity: 1};
+    // });
+    //
+    // const thumbnailSourceStyle = useAnimatedStyle(() => {
+    //     return {opacity: 1};
+    // });
+    //
+    // const animatedLoadingImageStyle = useAnimatedStyle(() => {
+    //     return {opacity: 1};
+    // });
 
     useEffect(() => {
         if (propsSource !== uri) {
@@ -88,7 +88,7 @@ const CachedImage = (props: IProps & typeof defaultProps) => {
         if (propsSource !== currentSource) {
             setCurrentSource(propsSource);
             setUri(undefined);
-            resetAnimations();
+            // resetAnimations();
         }
         /* eslint-disable react-hooks/exhaustive-deps */
     }, [propsSource, uri]);
@@ -126,19 +126,19 @@ const CachedImage = (props: IProps & typeof defaultProps) => {
     };
 
     const resetAnimations = () => {
-        animatedLoadingImage.value = 1;
-        animatedThumbnailImage.value = 0;
-        animatedImage.value = 0;
+        // animatedLoadingImage.value = 1;
+        // animatedThumbnailImage.value = 0;
+        // animatedImage.value = 0;
     };
 
     const onThumbnailLoad = () => {
-        animatedLoadingImage.value = withTiming(0, {}, () => {
-            animatedThumbnailImage.value = withTiming(1, {
-                duration:
-                    props.thumbnailAnimationDuration ||
-                    CacheManager.config.thumbnailAnimationDuration,
-            });
-        });
+        // animatedLoadingImage.value = withTiming(0, {}, () => {
+        //     animatedThumbnailImage.value = withTiming(1, {
+        //         duration:
+        //             props.thumbnailAnimationDuration ||
+        //             CacheManager.config.thumbnailAnimationDuration,
+        //     });
+        // });
     };
 
     const onImageError = (): void => setError(true);
@@ -147,11 +147,11 @@ const CachedImage = (props: IProps & typeof defaultProps) => {
         if (props.onLoad) {
             props.onLoad(e);
         }
-        animatedImage.value = withTiming(1, {
-            duration:
-                props.sourceAnimationDuration ||
-                CacheManager.config.sourceAnimationDuration,
-        });
+        // animatedImage.value = withTiming(1, {
+        //     duration:
+        //         props.sourceAnimationDuration ||
+        //         CacheManager.config.sourceAnimationDuration,
+        // });
     };
 
     const {
@@ -190,19 +190,19 @@ const CachedImage = (props: IProps & typeof defaultProps) => {
             {!isImageReady &&
             (LoadingImageComponent ? (
                 <AnimatedView
-                    style={[styles.loadingImageStyle, animatedLoadingImageStyle]}
+                    style={styles.loadingImageStyle}
                 >
                     <LoadingImageComponent/>
                 </AnimatedView>
             ) : (loadingSource ?
-                <View style={[styles.loadingImageStyle]}>
+                <View style={styles.loadingImageStyle}>
                     <AnimatedImage
                         accessibilityHint={accessibilityHintLoadingImage}
                         accessibilityLabel={accessibilityLabelLoadingImage}
                         accessibilityRole={accessibilityRoleLoadingSource || 'image'}
                         accessible
                         resizeMode={resizeMode || 'contain'}
-                        style={[animatedLoadingImageStyle, loadingImageStyle]}
+                        style={loadingImageStyle}
                         // @ts-ignore
                         source={loadingSource}
                     />
@@ -218,7 +218,7 @@ const CachedImage = (props: IProps & typeof defaultProps) => {
                     onLoad={onThumbnailLoad}
                     resizeMode={resizeMode || 'contain'}
                     source={{uri: thumbnailSource}}
-                    style={[style, thumbnailSourceStyle]}
+                    style={style}
                 />
             )}
             {imageSource && (
@@ -235,7 +235,7 @@ const CachedImage = (props: IProps & typeof defaultProps) => {
                     // @ts-ignore
                     source={imageSource}
                     // @ts-ignore
-                    style={[styles.imageStyle, imageSourceStyle]}
+                    style={styles.imageStyle}
                 />
             )}
         </View>
